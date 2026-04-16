@@ -38,24 +38,26 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo 'Building Docker image...'
-                sh "docker build -t ${DOCKERHUB_REPO}:${IMAGE_TAG} ."
-                sh "docker tag ${DOCKERHUB_REPO}:${IMAGE_TAG} ${DOCKERHUB_REPO}:latest"
+                sh "docker build -t shobanababu/cicd-app:${BUILD_NUMBER} ."
+                sh "docker tag shobanababu/cicd-app:${BUILD_NUMBER} shobanababu/cicd-app:latest"
             }
         }
 
         stage('Docker Push') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-                    sh "echo $PASS | docker login -u $USER --password-stdin"
-                    sh "docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}"
-                    sh "docker push ${DOCKERHUB_REPO}:latest"
-                }
-            }
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-creds',
+            usernameVariable: 'USER',
+            passwordVariable: 'PASS'
+        )]) {
+            sh '''
+                echo "$PASS" | docker login -u "$USER" --password-stdin
+                docker push shobanababu/cicd-app:${BUILD_NUMBER}
+                docker push shobanababu/cicd-app:latest
+            '''
         }
+    }
+}
 
         stage('Deploy') {
             steps {
