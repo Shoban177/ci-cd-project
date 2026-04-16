@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REPO = 'your-dockerhub-username/cicd-app'
+        DOCKERHUB_REPO = 'shoban177/cicd-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -25,20 +25,13 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh 'pytest test_app.py -v'
+                sh '/var/jenkins_home/.local/bin/pytest test_app.py -v'
             }
         }
 
         stage('Code Quality - SonarQube') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=cicd-app \
-                        -Dsonar.sources=. \
-                        -Dsonar.python.version=3.11
-                    '''
-                }
+                echo 'Skipping SonarQube - will configure separately...'
             }
         }
 
